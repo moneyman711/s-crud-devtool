@@ -1,0 +1,102 @@
+spring:
+  application:
+    name: modern-sitemanager
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/sitemanager_db?useSSL=true&requireSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=false
+    username: ${DB_USERNAME:sitemanager_user}
+    password: ${DB_PASSWORD:changeit_in_production}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+      pool-name: SiteManagerHikariPoolProd
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+  http2:
+    enabled: true
+  forward-headers-strategy: framework
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:changeit}
+    key-store-type: PKCS12
+
+# JWT Configuration - MUST be overridden in production
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: 43200000  # 12 hours
+  refresh-expiration-ms: 259200000  # 3 days
+  issuer: sitemanager-api
+  audience: sitemanager-client
+
+# Security Configuration
+security:
+  password:
+    strength: 14
+  session:
+    timeout-minutes: 15
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    allowed-methods: GET,POST,PUT,DELETE
+    allowed-headers: Authorization,Content-Type
+    allow-credentials: true
+  rate-limit:
+    enabled: true
+    requests-per-minute: 30
+    login-attempts: 3
+
+# Actuator - Secured in production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  security:
+    enabled: true
+
+# Logging
+logging:
+  level:
+    root: WARN
+    com.sitemanager: INFO
+    org.springframework.security: WARN
+  file:
+    name: /var/log/sitemanager/application.log
+    max-size: 50MB
+    max-history: 90
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Disable Swagger in production
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

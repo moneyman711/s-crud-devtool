@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: modern-sitemanager
+  
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 5
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  flyway:
+    enabled: false
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# JWT Configuration for testing
+jwt:
+  secret: test-secret-key-for-testing-purposes-only-min-32-chars
+  expiration-ms: 3600000
+  refresh-expiration-ms: 7200000
+  issuer: sitemanager-test
+  audience: sitemanager-client
+
+# Security Configuration for testing
+security:
+  password:
+    strength: 4
+  session:
+    timeout-minutes: 60
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "*"
+    allowed-headers: "*"
+  rate-limit:
+    enabled: false
+
+# Logging for testing
+logging:
+  level:
+    root: INFO
+    com.sitemanager: DEBUG
+    org.springframework.security: DEBUG
+
+# Enable Swagger for testing
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
